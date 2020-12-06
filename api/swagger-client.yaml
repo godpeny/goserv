@@ -1,0 +1,62 @@
+components:
+  schemas:
+    Request:
+      type: "object"
+      required:
+        - type
+        - name
+      properties:
+        type: 
+          type: "string"
+        name: 
+          type: "string"
+    Response:
+      type:
+        object
+      required:
+        - num
+        - target
+        - type
+        - name
+        - etc
+      properties:
+        num:
+          type: string
+        target:
+          type: string
+        type:
+          type: string
+        name:
+          type: string
+        etc:
+          type: string
+info:
+  license:
+    name: MIT
+  title: sample
+  version: 1.0.0
+openapi: 3.0.0
+paths:
+  /api/ping:
+    post:
+      operationId: "Create API Request"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Request'
+        required: true
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: "Bad request"
+        404:
+          description: "Not found"
+      summary: Create Request
+      tags:
+      - "CLIENT"

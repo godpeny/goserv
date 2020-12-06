@@ -1,0 +1,34 @@
+#components:
+#    schemas:
+#      ErrResponse:
+#        properties:
+#          msg:
+#            type: string
+#         request_id:
+#            type: string
+#        type: object
+info:
+    license:
+      name: MIT
+    title: goserv
+    version: 0.0.1
+openapi: 3.0.0
+paths:
+    /ping:
+      get:
+        operationId: 
+        responses:
+          200:
+            description: "goserv server health check"
+            content:
+              text/plain:
+                schema:
+                  type: string
+                  response: pong
+          400:
+            description: "Bad request"
+          404:
+            description: "Not found"
+        summary: check whether server is on
+        tags:
+          - "SERVER"
