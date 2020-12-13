@@ -21,3 +21,8 @@
 #docs/*.md
 # Then explicitly reverse the ignore rule for a single file:
 #!docs/README.md
+
+# make main.go and server functions not overwritten
+main.go
+go/api_user.go
+go/api_server.go
