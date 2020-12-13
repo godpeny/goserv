@@ -8,11 +8,9 @@
  */
 package swagger
 
-import (
-	"net/http"
-)
+type V1User struct {
 
-func HealthCheck(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	Name string `json:"name"`
+
+	Age int64 `json:"age"`
 }

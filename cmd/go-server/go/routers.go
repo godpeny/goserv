@@ -55,9 +55,16 @@ var routes = Routes{
 	},
 
 	Route{
-		"Null",
+		"HealthCheck",
 		strings.ToUpper("Get"),
 		"/ping",
-		Null,
+		HealthCheck,
+	},
+
+	Route{
+		"CreateUser",
+		strings.ToUpper("Post"),
+		"/api/v1/user",
+		CreateUser,
 	},
 }

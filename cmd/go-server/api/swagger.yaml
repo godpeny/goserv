@@ -12,7 +12,7 @@ paths:
       tags:
       - SERVER
       summary: check whether server is on
-      operationId: "null"
+      operationId: healthCheck
       responses:
         "200":
           description: goserv server health check
@@ -25,4 +25,34 @@ paths:
           description: Bad request
         "404":
           description: Not found
-components: {}
+  /api/v1/user:
+    post:
+      tags:
+      - user
+      summary: create user
+      operationId: createUser
+      responses:
+        "200":
+          description: create user
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+components:
+  schemas:
+    v1_user:
+      required:
+      - age
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+        age:
+          type: integer
+          format: int64

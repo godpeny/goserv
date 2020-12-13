@@ -1,3 +1,4 @@
+# TODO : seperate components and paths
 components:
   schemas:
     v1_user:
@@ -20,7 +21,7 @@ openapi: 3.0.0
 paths:
     /ping:
       get:
-        operationId: 
+        operationId: healthCheck
         responses:
           200:
             description: "goserv server health check"
@@ -36,3 +37,27 @@ paths:
         summary: check whether server is on
         tags:
           - "SERVER"
+    /api/v1/user:
+      post:
+        operationId: createUser
+        requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v1_user'
+        required: true 
+        responses:
+          200:
+            description: "create user"
+            content:
+              text/plain:
+                schema:
+                  type: string
+                  response: pong
+          400:
+            description: "Bad request"
+          404:
+            description: "Not found"
+        summary: create user
+        tags:
+          - "user"
