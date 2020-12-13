@@ -1,12 +1,16 @@
-#components:
-#    schemas:
-#      ErrResponse:
-#        properties:
-#          msg:
-#            type: string
-#         request_id:
-#            type: string
-#        type: object
+components:
+  schemas:
+    v1_user:
+      type: object
+      required:
+        - name
+        - age
+      properties:
+        name: 
+          type: string
+        age:
+          format: int64
+          type: integer
 info:
     license:
       name: MIT

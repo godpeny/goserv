@@ -19,12 +19,20 @@ import (
 	//
 	//    sw "github.com/myname/myrepo/go"
 	//
+	_ "github.com/go-sql-driver/mysql"
 	sw "github.com/godpeny/goserv/cmd/go-server/go"
+	model "github.com/godpeny/goserv/init/model"
 )
 
 func main() {
-	log.Printf("Server started")
+	// set db
+	client, err := model.InitModel()
+	if err != nil {
+		log.Fatalf("failed init Model : %v", err)
+	}
+	defer client.Close()
 
+	log.Printf("Server started")
 	router := sw.NewRouter()
 
 	log.Fatal(http.ListenAndServe(":8080", router))
