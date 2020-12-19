@@ -1,0 +1,211 @@
+openapi: 3.0.0
+info:
+  description: server template in GO.
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Goserver in Open API
+  version: 1.0.0
+servers:
+- url: /
+tags:
+- description: Everything about Users
+  name: user
+paths:
+  /ping:
+    get:
+      description: server health check
+      operationId: healthCheck
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: successful operation
+        "400":
+          description: Bad Request
+        "404":
+          description: Not found
+        "405":
+          description: Invalid input
+      summary: server health check
+      tags:
+      - ping
+  /api/v1/user:
+    get:
+      description: list all users
+      operationId: listUser
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: successful operation
+        "400":
+          description: Bad Request
+        "404":
+          description: Not found
+        "405":
+          description: Invalid input
+      summary: list users
+      tags:
+      - user
+    post:
+      description: create user
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requestBodies/V1_User'
+        description: Create user object
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: successful operation
+        "400":
+          description: Bad Request
+        "404":
+          description: Not found
+        "405":
+          description: Invalid input
+      summary: create user
+      tags:
+      - user
+  /api/v1/user/{username}:
+    delete:
+      description: Delete user
+      operationId: deleteUser
+      parameters:
+      - description: The name that needs to be deleted
+        explode: false
+        in: path
+        name: username
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: successful operation
+        "400":
+          description: Bad Request
+        "404":
+          description: Not found
+        "405":
+          description: Invalid input
+      summary: Delete user
+      tags:
+      - user
+    get:
+      description: Get user by user name
+      operationId: getUserByName
+      parameters:
+      - description: The name that needs to be fetched.
+        explode: false
+        in: path
+        name: username
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: successful operation
+        "400":
+          description: Bad Request
+        "404":
+          description: Not found
+        "405":
+          description: Invalid input
+      summary: Get user by user name
+      tags:
+      - user
+    put:
+      description: Updated user
+      operationId: updateUser
+      parameters:
+      - description: The name that need to be updated
+        explode: false
+        in: path
+        name: username
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requestBodies/V1_User'
+        description: Updated user object
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+          description: successful operation
+        "400":
+          description: Bad Request
+        "404":
+          description: Not found
+        "405":
+          description: Invalid input
+      summary: Updated user
+      tags:
+      - user
+components:
+  requestBodies:
+    V1_User:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/V1_User'
+      description: User object
+      required: true
+  schemas:
+    V1_User:
+      description: A User Schema
+      properties:
+        age:
+          format: int64
+          type: integer
+        name:
+          type: string
+      required:
+      - age
+      - name
+      title: a User
+      type: object
+    ApiResponse:
+      description: A Common Successful API response
+      example:
+        code: 0
+        type: type
+        message: message
+      properties:
+        code:
+          format: int32
+          type: integer
+        type:
+          type: string
+        message:
+          type: string
+      title: An API response
+      type: object

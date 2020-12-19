@@ -1,0 +1,72 @@
+openapi: 3.0.0
+info:
+  license:
+    name: MIT
+  title: sample
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /api/ping:
+    post:
+      operationId: Create API Request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Request'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+      summary: Create Request
+      tags:
+      - CLIENT
+components:
+  schemas:
+    Request:
+      example:
+        name: name
+        type: type
+      properties:
+        type:
+          type: string
+        name:
+          type: string
+      required:
+      - name
+      - type
+      type: object
+    Response:
+      example:
+        etc: etc
+        num: num
+        name: name
+        type: type
+        target: target
+      properties:
+        num:
+          type: string
+        target:
+          type: string
+        type:
+          type: string
+        name:
+          type: string
+        etc:
+          type: string
+      required:
+      - etc
+      - name
+      - num
+      - target
+      - type
+      type: object
