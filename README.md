@@ -5,16 +5,16 @@ server template in GO
 go run cmd/go-server/main.go
 
 ## generating go-server code
-using swagger-codegen 3.0.23
+using openapi-generator 5.0.0-beta3
 
-### Go API Server for swagger
+### API Server
 ```
-java -jar ./api/swagger-codegen-cli.jar generate  -i ./api/swagger-server.yaml -l go-server -o ./cmd/go-server
+java -jar ./api/openapi-generator-cli.jar generate -i ./api/swagger-server.yaml -g go-gin-server -o ./cmd/go-server --package-name api
 ```
 
-### Go API client for swagger
+### API Client (sample)
 ```
-java -jar ./api/swagger-codegen-cli.jar generate  -i ./api/swagger-client.yaml -l go -o ./internal/clients/sample
+java -jar ./api/openapi-generator-cli.jar generate -i ./api/swagger-client.yaml -g go -o ./internal/clients/sample --package-name client
 ```
 
 ### DB Schema for ent
