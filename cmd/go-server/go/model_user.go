@@ -9,10 +9,11 @@
 
 package api
 
-// V1User - A User Schema
-type V1User struct {
+type User struct {
 
-	Age int64 `json:"age"`
+	Age int64 `json:"age,omitempty"`
 
-	Name string `json:"name"`
+	Id int64 `json:"id,omitempty"`
+
+	Name string `json:"name,omitempty"`
 }

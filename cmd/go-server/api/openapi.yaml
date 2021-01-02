@@ -56,12 +56,7 @@ paths:
       description: create user
       operationId: createUser
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/requestBodies/V1_User'
-        description: Create user object
-        required: true
+        $ref: '#/components/requestBodies/User'
       responses:
         "200":
           content:
@@ -148,12 +143,7 @@ paths:
           type: string
         style: simple
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/requestBodies/V1_User'
-        description: Updated user object
-        required: true
+        $ref: '#/components/requestBodies/User'
       responses:
         "200":
           content:
@@ -172,26 +162,19 @@ paths:
       - user
 components:
   requestBodies:
-    V1_User:
+    User:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/V1_User'
-      description: User object
-      required: true
-  schemas:
-    V1_User:
-      description: A User Schema
       properties:
         age:
           format: int64
           type: integer
+              id:
+                format: int64
+                type: integer
         name:
           type: string
-      required:
-      - age
-      - name
-      title: a User
       type: object
     ApiResponse:
       description: A Common Successful API response

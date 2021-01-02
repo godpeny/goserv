@@ -22,7 +22,7 @@ import (
 // CreateUser - create user
 func CreateUser(c *gin.Context) {
 	ctx := context.Background()
-	req := &V1User{}
+	req := &User{}
 
 	if err := c.BindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

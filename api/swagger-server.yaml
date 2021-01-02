@@ -52,10 +52,7 @@ paths:
         '405':
           description: Invalid input
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/requestBodies/V1_User'
+        $ref: '#/components/requestBodies/User'
         description: Create user object
         required: true
     get:
@@ -131,10 +128,7 @@ paths:
         '405':
           description: Invalid input
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/requestBodies/V1_User'
+        $ref: '#/components/requestBodies/User'
         description: Updated user object
         required: true
     delete:
@@ -165,27 +159,21 @@ paths:
           description: Invalid input
 components:
   requestBodies:
-    V1_User:
+    User:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/V1_User'
-      description: User object
-      required: true
-  schemas:
-    V1_User:
-      title: a User
-      description: A User Schema
-      type: object
-      required:
-        - name
-        - age
       properties:
         age:
+                format: int64
           type: integer
+              id:
           format: int64
+                type: integer
         name:
           type: string
+            type: object
+  schemas:
     ApiResponse:
       title: An API response
       description: A Common Successful API response
