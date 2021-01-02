@@ -1,0 +1,41 @@
+components:
+  requestBodies:
+    User:
+      content:
+        application/json:
+          schema:
+            properties:
+              age:
+                format: int64
+                type: integer
+              id:
+                format: int64
+                type: integer
+              name:
+                type: string
+            type: object
+  schemas:
+    ApiResponse:
+      properties:
+        code:
+          format: int64
+          type: integer
+        id:
+          format: int64
+          type: integer
+        message:
+          type: string
+        type:
+          type: string
+      type: object
+    User:
+      properties:
+        age:
+          format: int64
+          type: integer
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+      type: object

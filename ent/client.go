@@ -9,6 +9,7 @@ import (
 
 	"github.com/godpeny/goserv/ent/migrate"
 
+	"github.com/godpeny/goserv/ent/apiresponse"
 	"github.com/godpeny/goserv/ent/project"
 	"github.com/godpeny/goserv/ent/user"
 
@@ -21,6 +22,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// APIResponse is the client for interacting with the APIResponse builders.
+	APIResponse *APIResponseClient
 	// Project is the client for interacting with the Project builders.
 	Project *ProjectClient
 	// User is the client for interacting with the User builders.
@@ -38,6 +41,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.APIResponse = NewAPIResponseClient(c.config)
 	c.Project = NewProjectClient(c.config)
 	c.User = NewUserClient(c.config)
 }
@@ -70,10 +74,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	}
 	cfg := config{driver: tx, log: c.log, debug: c.debug, hooks: c.hooks}
 	return &Tx{
-		ctx:     ctx,
-		config:  cfg,
-		Project: NewProjectClient(cfg),
-		User:    NewUserClient(cfg),
+		ctx:         ctx,
+		config:      cfg,
+		APIResponse: NewAPIResponseClient(cfg),
+		Project:     NewProjectClient(cfg),
+		User:        NewUserClient(cfg),
 	}, nil
 }
 
@@ -88,16 +93,17 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	}
 	cfg := config{driver: &txDriver{tx: tx, drv: c.driver}, log: c.log, debug: c.debug, hooks: c.hooks}
 	return &Tx{
-		config:  cfg,
-		Project: NewProjectClient(cfg),
-		User:    NewUserClient(cfg),
+		config:      cfg,
+		APIResponse: NewAPIResponseClient(cfg),
+		Project:     NewProjectClient(cfg),
+		User:        NewUserClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Project.
+//		APIResponse.
 //		Query().
 //		Count(ctx)
 //
@@ -119,8 +125,97 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.APIResponse.Use(hooks...)
 	c.Project.Use(hooks...)
 	c.User.Use(hooks...)
+}
+
+// APIResponseClient is a client for the APIResponse schema.
+type APIResponseClient struct {
+	config
+}
+
+// NewAPIResponseClient returns a client for the APIResponse from the given config.
+func NewAPIResponseClient(c config) *APIResponseClient {
+	return &APIResponseClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `apiresponse.Hooks(f(g(h())))`.
+func (c *APIResponseClient) Use(hooks ...Hook) {
+	c.hooks.APIResponse = append(c.hooks.APIResponse, hooks...)
+}
+
+// Create returns a create builder for APIResponse.
+func (c *APIResponseClient) Create() *APIResponseCreate {
+	mutation := newAPIResponseMutation(c.config, OpCreate)
+	return &APIResponseCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of APIResponse entities.
+func (c *APIResponseClient) CreateBulk(builders ...*APIResponseCreate) *APIResponseCreateBulk {
+	return &APIResponseCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for APIResponse.
+func (c *APIResponseClient) Update() *APIResponseUpdate {
+	mutation := newAPIResponseMutation(c.config, OpUpdate)
+	return &APIResponseUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *APIResponseClient) UpdateOne(ar *APIResponse) *APIResponseUpdateOne {
+	mutation := newAPIResponseMutation(c.config, OpUpdateOne, withAPIResponse(ar))
+	return &APIResponseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *APIResponseClient) UpdateOneID(id int) *APIResponseUpdateOne {
+	mutation := newAPIResponseMutation(c.config, OpUpdateOne, withAPIResponseID(id))
+	return &APIResponseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for APIResponse.
+func (c *APIResponseClient) Delete() *APIResponseDelete {
+	mutation := newAPIResponseMutation(c.config, OpDelete)
+	return &APIResponseDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *APIResponseClient) DeleteOne(ar *APIResponse) *APIResponseDeleteOne {
+	return c.DeleteOneID(ar.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *APIResponseClient) DeleteOneID(id int) *APIResponseDeleteOne {
+	builder := c.Delete().Where(apiresponse.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &APIResponseDeleteOne{builder}
+}
+
+// Query returns a query builder for APIResponse.
+func (c *APIResponseClient) Query() *APIResponseQuery {
+	return &APIResponseQuery{config: c.config}
+}
+
+// Get returns a APIResponse entity by its id.
+func (c *APIResponseClient) Get(ctx context.Context, id int) (*APIResponse, error) {
+	return c.Query().Where(apiresponse.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *APIResponseClient) GetX(ctx context.Context, id int) *APIResponse {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *APIResponseClient) Hooks() []Hook {
+	return c.hooks.APIResponse
 }
 
 // ProjectClient is a client for the Project schema.

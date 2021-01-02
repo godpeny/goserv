@@ -9,12 +9,13 @@
 
 package api
 
-// ApiResponse - A Common Successful API response
 type ApiResponse struct {
 
-	Code int32 `json:"code,omitempty"`
+	Code int64 `json:"code,omitempty"`
 
-	Type string `json:"type,omitempty"`
+	Id int64 `json:"id,omitempty"`
 
 	Message string `json:"message,omitempty"`
+
+	Type string `json:"type,omitempty"`
 }

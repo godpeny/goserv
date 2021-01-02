@@ -166,29 +166,43 @@ components:
       content:
         application/json:
           schema:
+            properties:
+              age:
+                format: int64
+                type: integer
+              id:
+                format: int64
+                type: integer
+              name:
+                type: string
+            type: object
+  schemas:
+    ApiResponse:
+      example:
+        code: 0
+        id: 6
+        message: message
+        type: type
+      properties:
+        code:
+          format: int64
+          type: integer
+        id:
+          format: int64
+          type: integer
+        message:
+          type: string
+        type:
+          type: string
+      type: object
+    User:
       properties:
         age:
           format: int64
           type: integer
-              id:
-                format: int64
-                type: integer
+        id:
+          format: int64
+          type: integer
         name:
           type: string
-      type: object
-    ApiResponse:
-      description: A Common Successful API response
-      example:
-        code: 0
-        type: type
-        message: message
-      properties:
-        code:
-          format: int32
-          type: integer
-        type:
-          type: string
-        message:
-          type: string
-      title: An API response
       type: object

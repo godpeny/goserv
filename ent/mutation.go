@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/godpeny/goserv/ent/apiresponse"
 	"github.com/godpeny/goserv/ent/predicate"
 	"github.com/godpeny/goserv/ent/user"
 
@@ -22,9 +23,450 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeProject = "Project"
-	TypeUser    = "User"
+	TypeAPIResponse = "APIResponse"
+	TypeProject     = "Project"
+	TypeUser        = "User"
 )
+
+// APIResponseMutation represents an operation that mutate the APIResponses
+// nodes in the graph.
+type APIResponseMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	code          *int
+	addcode       *int
+	_type         *string
+	message       *string
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*APIResponse, error)
+	predicates    []predicate.APIResponse
+}
+
+var _ ent.Mutation = (*APIResponseMutation)(nil)
+
+// apiresponseOption allows to manage the mutation configuration using functional options.
+type apiresponseOption func(*APIResponseMutation)
+
+// newAPIResponseMutation creates new mutation for $n.Name.
+func newAPIResponseMutation(c config, op Op, opts ...apiresponseOption) *APIResponseMutation {
+	m := &APIResponseMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeAPIResponse,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withAPIResponseID sets the id field of the mutation.
+func withAPIResponseID(id int) apiresponseOption {
+	return func(m *APIResponseMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *APIResponse
+		)
+		m.oldValue = func(ctx context.Context) (*APIResponse, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().APIResponse.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withAPIResponse sets the old APIResponse of the mutation.
+func withAPIResponse(node *APIResponse) apiresponseOption {
+	return func(m *APIResponseMutation) {
+		m.oldValue = func(context.Context) (*APIResponse, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m APIResponseMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m APIResponseMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the id value in the mutation. Note that, the id
+// is available only if it was provided to the builder.
+func (m *APIResponseMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetCode sets the code field.
+func (m *APIResponseMutation) SetCode(i int) {
+	m.code = &i
+	m.addcode = nil
+}
+
+// Code returns the code value in the mutation.
+func (m *APIResponseMutation) Code() (r int, exists bool) {
+	v := m.code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCode returns the old code value of the APIResponse.
+// If the APIResponse object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *APIResponseMutation) OldCode(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCode is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCode: %w", err)
+	}
+	return oldValue.Code, nil
+}
+
+// AddCode adds i to code.
+func (m *APIResponseMutation) AddCode(i int) {
+	if m.addcode != nil {
+		*m.addcode += i
+	} else {
+		m.addcode = &i
+	}
+}
+
+// AddedCode returns the value that was added to the code field in this mutation.
+func (m *APIResponseMutation) AddedCode() (r int, exists bool) {
+	v := m.addcode
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCode reset all changes of the "code" field.
+func (m *APIResponseMutation) ResetCode() {
+	m.code = nil
+	m.addcode = nil
+}
+
+// SetType sets the type field.
+func (m *APIResponseMutation) SetType(s string) {
+	m._type = &s
+}
+
+// GetType returns the type value in the mutation.
+func (m *APIResponseMutation) GetType() (r string, exists bool) {
+	v := m._type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldType returns the old type value of the APIResponse.
+// If the APIResponse object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *APIResponseMutation) OldType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldType is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldType: %w", err)
+	}
+	return oldValue.Type, nil
+}
+
+// ResetType reset all changes of the "type" field.
+func (m *APIResponseMutation) ResetType() {
+	m._type = nil
+}
+
+// SetMessage sets the message field.
+func (m *APIResponseMutation) SetMessage(s string) {
+	m.message = &s
+}
+
+// Message returns the message value in the mutation.
+func (m *APIResponseMutation) Message() (r string, exists bool) {
+	v := m.message
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMessage returns the old message value of the APIResponse.
+// If the APIResponse object wasn't provided to the builder, the object is fetched
+// from the database.
+// An error is returned if the mutation operation is not UpdateOne, or database query fails.
+func (m *APIResponseMutation) OldMessage(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldMessage is allowed only on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldMessage requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMessage: %w", err)
+	}
+	return oldValue.Message, nil
+}
+
+// ResetMessage reset all changes of the "message" field.
+func (m *APIResponseMutation) ResetMessage() {
+	m.message = nil
+}
+
+// Op returns the operation name.
+func (m *APIResponseMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (APIResponse).
+func (m *APIResponseMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during
+// this mutation. Note that, in order to get all numeric
+// fields that were in/decremented, call AddedFields().
+func (m *APIResponseMutation) Fields() []string {
+	fields := make([]string, 0, 3)
+	if m.code != nil {
+		fields = append(fields, apiresponse.FieldCode)
+	}
+	if m._type != nil {
+		fields = append(fields, apiresponse.FieldType)
+	}
+	if m.message != nil {
+		fields = append(fields, apiresponse.FieldMessage)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name.
+// The second boolean value indicates that this field was
+// not set, or was not define in the schema.
+func (m *APIResponseMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case apiresponse.FieldCode:
+		return m.Code()
+	case apiresponse.FieldType:
+		return m.GetType()
+	case apiresponse.FieldMessage:
+		return m.Message()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database.
+// An error is returned if the mutation operation is not UpdateOne,
+// or the query to the database was failed.
+func (m *APIResponseMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case apiresponse.FieldCode:
+		return m.OldCode(ctx)
+	case apiresponse.FieldType:
+		return m.OldType(ctx)
+	case apiresponse.FieldMessage:
+		return m.OldMessage(ctx)
+	}
+	return nil, fmt.Errorf("unknown APIResponse field %s", name)
+}
+
+// SetField sets the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *APIResponseMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case apiresponse.FieldCode:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCode(v)
+		return nil
+	case apiresponse.FieldType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetType(v)
+		return nil
+	case apiresponse.FieldMessage:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMessage(v)
+		return nil
+	}
+	return fmt.Errorf("unknown APIResponse field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented
+// or decremented during this mutation.
+func (m *APIResponseMutation) AddedFields() []string {
+	var fields []string
+	if m.addcode != nil {
+		fields = append(fields, apiresponse.FieldCode)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was in/decremented
+// from a field with the given name. The second value indicates
+// that this field was not set, or was not define in the schema.
+func (m *APIResponseMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case apiresponse.FieldCode:
+		return m.AddedCode()
+	}
+	return nil, false
+}
+
+// AddField adds the value for the given name. It returns an
+// error if the field is not defined in the schema, or if the
+// type mismatch the field type.
+func (m *APIResponseMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case apiresponse.FieldCode:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCode(v)
+		return nil
+	}
+	return fmt.Errorf("unknown APIResponse numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared
+// during this mutation.
+func (m *APIResponseMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicates if this field was
+// cleared in this mutation.
+func (m *APIResponseMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value for the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *APIResponseMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown APIResponse nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation regarding the
+// given field name. It returns an error if the field is not
+// defined in the schema.
+func (m *APIResponseMutation) ResetField(name string) error {
+	switch name {
+	case apiresponse.FieldCode:
+		m.ResetCode()
+		return nil
+	case apiresponse.FieldType:
+		m.ResetType()
+		return nil
+	case apiresponse.FieldMessage:
+		m.ResetMessage()
+		return nil
+	}
+	return fmt.Errorf("unknown APIResponse field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this
+// mutation.
+func (m *APIResponseMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all ids (to other nodes) that were added for
+// the given edge name.
+func (m *APIResponseMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this
+// mutation.
+func (m *APIResponseMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all ids (to other nodes) that were removed for
+// the given edge name.
+func (m *APIResponseMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this
+// mutation.
+func (m *APIResponseMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean indicates if this edge was
+// cleared in this mutation.
+func (m *APIResponseMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value for the given name. It returns an
+// error if the edge name is not defined in the schema.
+func (m *APIResponseMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown APIResponse unique edge %s", name)
+}
+
+// ResetEdge resets all changes in the mutation regarding the
+// given edge name. It returns an error if the edge is not
+// defined in the schema.
+func (m *APIResponseMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown APIResponse edge %s", name)
+}
 
 // ProjectMutation represents an operation that mutate the Projects
 // nodes in the graph.

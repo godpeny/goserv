@@ -9,6 +9,19 @@ import (
 	"github.com/godpeny/goserv/ent"
 )
 
+// The APIResponseFunc type is an adapter to allow the use of ordinary
+// function as APIResponse mutator.
+type APIResponseFunc func(context.Context, *ent.APIResponseMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f APIResponseFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.APIResponseMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.APIResponseMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The ProjectFunc type is an adapter to allow the use of ordinary
 // function as Project mutator.
 type ProjectFunc func(context.Context, *ent.ProjectMutation) (ent.Value, error)

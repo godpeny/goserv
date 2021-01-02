@@ -16,6 +16,7 @@ java -jar ./api/openapi-generator-cli.jar generate -i ./api/swagger-server.yaml 
 ```
 java -jar ./api/openapi-generator-cli.jar generate -i ./api/swagger-client.yaml -g go -o ./internal/clients/sample --package-name client
 ```
+Use ``api/codgen-server.go`` to create ``swagger-server.yaml``
 
 ### DB Schema for ent
 ```

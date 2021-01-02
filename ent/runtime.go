@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"github.com/godpeny/goserv/ent/apiresponse"
 	"github.com/godpeny/goserv/ent/schema"
 	"github.com/godpeny/goserv/ent/user"
 )
@@ -11,6 +12,20 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	apiresponseFields := schema.APIResponse{}.Fields()
+	_ = apiresponseFields
+	// apiresponseDescCode is the schema descriptor for code field.
+	apiresponseDescCode := apiresponseFields[0].Descriptor()
+	// apiresponse.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	apiresponse.CodeValidator = apiresponseDescCode.Validators[0].(func(int) error)
+	// apiresponseDescType is the schema descriptor for type field.
+	apiresponseDescType := apiresponseFields[1].Descriptor()
+	// apiresponse.DefaultType holds the default value on creation for the type field.
+	apiresponse.DefaultType = apiresponseDescType.Default.(string)
+	// apiresponseDescMessage is the schema descriptor for message field.
+	apiresponseDescMessage := apiresponseFields[2].Descriptor()
+	// apiresponse.DefaultMessage holds the default value on creation for the message field.
+	apiresponse.DefaultMessage = apiresponseDescMessage.Default.(string)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescAge is the schema descriptor for age field.

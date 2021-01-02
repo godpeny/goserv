@@ -8,6 +8,20 @@ import (
 )
 
 var (
+	// APIResponsesColumns holds the columns for the "api_responses" table.
+	APIResponsesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "code", Type: field.TypeInt},
+		{Name: "type", Type: field.TypeString, Default: "unknown"},
+		{Name: "message", Type: field.TypeString, Default: "unknown"},
+	}
+	// APIResponsesTable holds the schema information for the "api_responses" table.
+	APIResponsesTable = &schema.Table{
+		Name:        "api_responses",
+		Columns:     APIResponsesColumns,
+		PrimaryKey:  []*schema.Column{APIResponsesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
+	}
 	// ProjectsColumns holds the columns for the "projects" table.
 	ProjectsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -34,6 +48,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		APIResponsesTable,
 		ProjectsTable,
 		UsersTable,
 	}
