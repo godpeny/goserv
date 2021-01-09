@@ -1,15 +1,15 @@
 # GOSERV
 server template in GO
 
-## Run Server
-go run cmd/go-server/main.go
+## Run API Server
+go run cmd/goserv-api/main.go
 
 ## Generating Code
 using openapi-generator 5.0.0-beta3
 
 ### API Server
 ```
-java -jar ./api/openapi-generator-cli.jar generate -i ./api/swagger-server.yaml -g go-gin-server -o ./cmd/go-server --package-name api
+java -jar ./api/openapi-generator-cli.jar generate -i ./api/swagger-server.yaml -g go-gin-server -o ./internal/goserv-api --package-name api
 ```
 
 ### API Client (sample)
