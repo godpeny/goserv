@@ -10,39 +10,27 @@
 package api
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog/log"
 
-	ent_client "github.com/godpeny/goserv/internal/clients/ent"
+	ent "github.com/godpeny/goserv/ent"
+	db "github.com/godpeny/goserv/internal/goserv-db"
 )
 
 // CreateUser - create user
 func CreateUser(c *gin.Context) {
-	ctx := context.Background()
-	req := &User{}
+	req := &ent.User{}
 
 	if err := c.BindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// db
-	client, err := ent_client.GetClient()
-	if err != nil {
-		log.Error().Msgf("error from CreateUser get ent client %s", err)
-	}
+	db.RunMQ_User("CREATE", *req, c)
+	res := <-db.APIc
 
-	_, err = client.User.Create().SetAge(int(req.Age)).SetName(req.Name).Save(ctx)
-	if err != nil {
-		log.Error().Interface("CreateUser", req).Msgf("error from CreateUser db %s", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{})
+	c.JSON(http.StatusOK, res)
 }
 
 // DeleteUser - Delete user
@@ -57,7 +45,17 @@ func GetUserByName(c *gin.Context) {
 
 // ListUser - list users
 func ListUser(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{})
+	req := &ent.User{}
+
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	db.RunMQ_User("READ", *req, c)
+	res := <-db.APIc
+
+	c.JSON(http.StatusOK, res)
 }
 
 // UpdateUser - Updated user

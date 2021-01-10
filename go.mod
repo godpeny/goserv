@@ -12,6 +12,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/labstack/gommon v0.3.0
 	github.com/rs/zerolog v1.20.0
+	github.com/streadway/amqp v1.0.0
 	golang.org/x/oauth2 v0.0.0-20201203001011-0b49973bad19
 	sigs.k8s.io/yaml v1.2.0
 )
