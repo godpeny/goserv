@@ -24,6 +24,17 @@ func InitMQClient() {
 	ch, err := conn.Channel()
 	failOnError(err, "Failed to open a channel")
 
+	err = ch.ExchangeDeclare(
+		"default", // name
+		"direct",  // type
+		true,      // durable
+		false,     // auto-deleted
+		false,     // internal
+		false,     // no-wait
+		nil,       // arguments
+	)
+	failOnError(err, "Failed to declare an exchange")
+
 	q, err := ch.QueueDeclare(
 		"",    // name
 		false, // durable
@@ -75,10 +86,10 @@ func RunMQ_User(msgType string, req ent.User, c *gin.Context) {
 		}
 
 		err = ch.Publish(
-			"",          // exchange
-			"rpc_queue", // routing key
-			false,       // mandatory
-			false,       // immediate
+			"default", // exchange
+			"rpc",     // routing key
+			false,     // mandatory
+			false,     // immediate
 			amqp.Publishing{
 				ContentType:   "text/plain",
 				CorrelationId: corrId,

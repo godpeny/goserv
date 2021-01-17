@@ -32,6 +32,17 @@ func InitMQServer() {
 	ch, err := conn.Channel()
 	failOnError(err, "Failed to open a channel")
 
+	err = ch.ExchangeDeclare(
+		"default", // name
+		"direct",  // type
+		true,      // durable
+		false,     // auto-deleted
+		false,     // internal
+		false,     // no-wait
+		nil,       // arguments
+	)
+	failOnError(err, "Failed to declare an exchange")
+
 	q, err := ch.QueueDeclare(
 		"rpc_queue", // name
 		false,       // durable
@@ -41,6 +52,14 @@ func InitMQServer() {
 		nil,         // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
+
+	err = ch.QueueBind(
+		q.Name,    // queue name
+		"rpc",     // routing key
+		"default", // exchange
+		false,
+		nil)
+	failOnError(err, "Failed to bind a queue")
 
 	err = ch.Qos(
 		1,     // prefetch count
