@@ -13,6 +13,11 @@ import (
 	"github.com/streadway/amqp"
 )
 
+const (
+	defaultExchange = "default"
+	rpc             = "rpc"
+)
+
 type MessageQueue struct {
 	Conn    *amqp.Connection
 	Channel *amqp.Channel
@@ -101,75 +106,103 @@ func RunMQServer() {
 
 		go func() {
 			for d := range MQ.Delivery {
-				ctx := context.Background()
-
-				if d.Type == "READ" {
-					request := ent.User{}
-					if err := json.Unmarshal(d.Body, &request); err != nil {
-						failOnError(err, "Failed to Unmarshal req")
-					}
-
-					client, err := ent_client.GetClient()
-					if err != nil {
-						failOnError(err, "Failed to Get Ent Client")
-					}
-
-					lst, err := client.User.Query().All(ctx)
-					if err != nil {
-						failOnError(err, "Failed to Create User db")
-					}
-
-					for idx, val := range lst {
-						fmt.Println(idx, " : ", val.Name)
-					}
-
-					err = ch.Publish(
-						"",        // exchange
-						d.ReplyTo, // routing key
-						false,     // mandatory
-						false,     // immediate
-						amqp.Publishing{
-							ContentType:   "text/plain",
-							CorrelationId: d.CorrelationId,
-							Body:          []byte(strconv.Itoa(2)),
-						})
-					failOnError(err, "Failed to publish a message")
-				} else if d.Type == "CREATE" {
-
-					request := ent.User{}
-					if err := json.Unmarshal(d.Body, &request); err != nil {
-						failOnError(err, "Failed to Unmarshal req")
-					}
-
-					client, err := ent_client.GetClient()
-					if err != nil {
-						failOnError(err, "Failed to Get Ent Client")
-					}
-
-					_, err = client.User.Create().SetAge(int(request.Age)).SetName(request.Name).Save(ctx)
-					if err != nil {
-						failOnError(err, "Failed to Create User db")
-					}
-
-					err = ch.Publish(
-						"",        // exchange
-						d.ReplyTo, // routing key
-						false,     // mandatory
-						false,     // immediate
-						amqp.Publishing{
-							ContentType:   "text/plain",
-							CorrelationId: d.CorrelationId,
-							Body:          []byte(strconv.Itoa(1)),
-						})
-					failOnError(err, "Failed to publish a message")
-				}
-				d.Ack(false)
+				processExchange(conn, ch, d)
 			}
 		}()
 
 		log.Printf(" [*] Awaiting RPC requests")
 		<-forever
 	}()
+}
+
+func processExchange(conn *amqp.Connection, ch *amqp.Channel, delivery amqp.Delivery) {
+	excName := delivery.Exchange
+	switch excName {
+	case defaultExchange:
+		processRoutingKey(conn, ch, delivery)
+	}
+
+}
+
+func processRoutingKey(conn *amqp.Connection, ch *amqp.Channel, delivery amqp.Delivery) {
+	routingKey := delivery.RoutingKey
+
+	switch routingKey {
+	case rpc:
+		processRoutingKey_RPC(conn, ch, delivery)
+	}
+}
+
+func processRoutingKey_RPC(conn *amqp.Connection, ch *amqp.Channel, delivery amqp.Delivery) {
+	ctx := context.Background()
+
+	if delivery.Type == "READ" {
+		request := ent.User{}
+		if err := json.Unmarshal(delivery.Body, &request); err != nil {
+			log.Println(err, "Failed to Unmarshal req")
+		}
+
+		client, err := ent_client.GetClient()
+		if err != nil {
+			log.Println(err, "Failed to Get Ent Client")
+		}
+
+		lst, err := client.User.Query().All(ctx)
+		if err != nil {
+			log.Println(err, "Failed to Create User db")
+		}
+
+		for idx, val := range lst {
+			fmt.Println(idx, " : ", val.Name)
+		}
+
+		err = ch.Publish(
+			"",               // exchange
+			delivery.ReplyTo, // routing key
+			false,            // mandatory
+			false,            // immediate
+			amqp.Publishing{
+				ContentType:   "text/plain",
+				CorrelationId: delivery.CorrelationId,
+				Body:          []byte(strconv.Itoa(2)),
+			})
+
+		if err != nil {
+			log.Println(err, "Failed to publish a message")
+		}
+	} else if delivery.Type == "CREATE" {
+
+		request := ent.User{}
+		if err := json.Unmarshal(delivery.Body, &request); err != nil {
+			log.Println(err, "Failed to Unmarshal req")
+		}
+
+		client, err := ent_client.GetClient()
+		if err != nil {
+			log.Println(err, "Failed to Get Ent Client")
+		}
+
+		_, err = client.User.Create().SetAge(int(request.Age)).SetName(request.Name).Save(ctx)
+		if err != nil {
+			log.Println(err, "Failed to Create User db")
+		}
+
+		err = ch.Publish(
+			"",               // exchange
+			delivery.ReplyTo, // routing key
+			false,            // mandatory
+			false,            // immediate
+			amqp.Publishing{
+				ContentType:   "text/plain",
+				CorrelationId: delivery.CorrelationId,
+				Body:          []byte(strconv.Itoa(1)),
+			})
+
+		if err != nil {
+			log.Println(err, "Failed to publish a message")
+		}
+	}
+	delivery.Ack(false)
 }
 
 func failOnError(err error, msg string) {

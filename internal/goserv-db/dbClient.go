@@ -82,7 +82,7 @@ func RunMQ_User(msgType string, req ent.User, c *gin.Context) {
 		// Marshalling
 		body, err := json.Marshal(req)
 		if err != nil {
-			failOnError(err, "Failed to Marshal req")
+			log.Println(err, "Failed to Marshal req")
 		}
 
 		err = ch.Publish(
@@ -97,13 +97,13 @@ func RunMQ_User(msgType string, req ent.User, c *gin.Context) {
 				Type:          msgType,
 				Body:          body,
 			})
-		failOnError(err, "Failed to publish a message")
+		log.Println(err, "Failed to publish a message")
 
 		for d := range MQ_Client.Delivery {
 			if corrId == d.CorrelationId {
 				res, err := strconv.Atoi(string(d.Body))
 				log.Printf("[.] Got %d", res)
-				failOnError(err, "Failed to convert body to integer")
+				log.Println(err, "Failed to convert body to integer")
 
 				APIc <- res
 				break
