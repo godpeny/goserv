@@ -27,10 +27,7 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	db.RunMQ_User("CREATE", *req, c)
-	res := <-db.APIc
-
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, handleResponse(c, req, "CREATE"))
 }
 
 // DeleteUser - Delete user
@@ -52,13 +49,17 @@ func ListUser(c *gin.Context) {
 		return
 	}
 
-	db.RunMQ_User("READ", *req, c)
-	res := <-db.APIc
-
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, handleResponse(c, req, "READ"))
 }
 
 // UpdateUser - Updated user
 func UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})
+}
+
+func handleResponse(c *gin.Context, req *ent.User, crud string) string {
+	db.RunMQ_User(crud, *req, c)
+	res := <-db.APIc
+
+	return string(res)
 }

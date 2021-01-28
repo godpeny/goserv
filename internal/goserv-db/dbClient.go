@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"math/rand"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	ent "github.com/godpeny/goserv/ent"
@@ -14,7 +13,7 @@ import (
 
 var (
 	MQ_Client MessageQueue
-	APIc      chan int
+	APIc      chan []byte
 )
 
 func InitMQClient() {
@@ -64,7 +63,7 @@ func InitMQClient() {
 	}
 
 	MQ_Client = mq
-	APIc = make(chan int)
+	APIc = make(chan []byte)
 }
 
 func RunMQ_User(msgType string, req ent.User, c *gin.Context) {
@@ -101,9 +100,8 @@ func RunMQ_User(msgType string, req ent.User, c *gin.Context) {
 
 		for d := range MQ_Client.Delivery {
 			if corrId == d.CorrelationId {
-				res, err := strconv.Atoi(string(d.Body))
+				res := d.Body
 				log.Printf("[.] Got %d", res)
-				log.Println(err, "Failed to convert body to integer")
 
 				APIc <- res
 				break

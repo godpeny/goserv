@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"strconv"
 
@@ -152,8 +151,10 @@ func processRoutingKey_RPC(conn *amqp.Connection, ch *amqp.Channel, delivery amq
 			log.Println(err, "Failed to Create User db")
 		}
 
-		for idx, val := range lst {
-			fmt.Println(idx, " : ", val.Name)
+		out, err := json.Marshal(lst)
+
+		if err != nil {
+			log.Println(err, "Failed to Marshal")
 		}
 
 		err = ch.Publish(
@@ -164,7 +165,7 @@ func processRoutingKey_RPC(conn *amqp.Connection, ch *amqp.Channel, delivery amq
 			amqp.Publishing{
 				ContentType:   "text/plain",
 				CorrelationId: delivery.CorrelationId,
-				Body:          []byte(strconv.Itoa(2)),
+				Body:          []byte(out),
 			})
 
 		if err != nil {
